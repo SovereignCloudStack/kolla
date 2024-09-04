@@ -18,8 +18,8 @@ FROM {{ namespace }}/{{ image_prefix }}openvswitch-base:{{ tag }}
     ] %}
 {% elif base_package_type == 'deb' %}
     {% set openvswitch_ipsec_packages = [
+        'libreswan',
         'openvswitch-ipsec',
-        'supervisor',
     ] %}
 
 {% endif %}
@@ -27,14 +27,17 @@ FROM {{ namespace }}/{{ image_prefix }}openvswitch-base:{{ tag }}
 
 {% endblock %}
 
-{% block install_supervisor %}
-{% set openvswitch_ipsec_pip_packages = [
-    'supervisor',
-] %}
-{% if base_package_type == 'rpm' %}
-    # TODO consider using upper_constraints
-    RUN {{ macros.install_pip(openvswitch_ipsec_pip_packages | customizable("pip_packages"), false) }}
-{% endif %}
+{% block install_supervision %}
+{% set s6_overlay_version = 'https://github.com/just-containers/s6-overlay/releases/download/' %}
+{% set s6_overlay_url = '' %}
+{% set s6_overlay_noarch_checksum = 'sha256:4b0c0907e6762814c31850e0e6c6762c385571d4656eb8725852b0b1586713b6' %}
+ADD --checksum={{ s6_overlay_noarch_checksum }} \
+    {{ s6_overlay_url }}/{{ s6_overlay_version }}/s6-overlay-noarch.tar.xz /tmp
+RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
+    && rm /tmp/s6-overlay-noarch.tar.xz
+ADD {{ s6_overlay_url }}/{{ s6_overlay_version }}/s6-overlay-{{ base_arch }}.tar.xz /tmp
+RUN tar -C / -Jxpf /tmp/s6-overlay-bin.tar.xz \
+    && rm /tmp/s6-overlay-bin.tar.xz
 {% endblock %}
 
 {% block openvswitch_ipsec_footer %}{% endblock %}
