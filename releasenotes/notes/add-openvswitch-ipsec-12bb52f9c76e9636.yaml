@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adding Libreswan and openvswitch-ipsec for transparent IPsec
+    encryption of tunneled tenant traffic in OVN managed networks.

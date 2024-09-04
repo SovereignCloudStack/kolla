@@ -1,0 +1,51 @@
+FROM {{ namespace }}/{{ image_prefix }}openvswitch-base:{{ tag }}
+{% block labels %}
+    LABEL maintainer="{{ maintainer }}" name="{{ image_name }}" build-date="{{ build_date }}"
+{% endblock %}
+
+{% block openvswitch_ipsec_header %}{% endblock %}
+
+{% import "macros.j2" as macros with context %}
+
+{{ macros.enable_extra_repos(['openvswitch']) }}
+
+{% block ovs_ipsec_install %}
+
+{% if base_package_type == 'rpm' %}
+    {% set openvswitch_ipsec_packages = [
+        'xz',
+        'libreswan',
+        'openvswitch3.3-ipsec',
+    ] %}
+{% elif base_package_type == 'deb' %}
+    {% set openvswitch_ipsec_packages = [
+        'libreswan',
+        'openvswitch-ipsec',
+    ] %}
+
+{% endif %}
+{{ macros.install_packages(openvswitch_ipsec_packages | customizable("packages")) }}
+
+{% endblock %}
+
+{% block install_supervision %}
+{% set s6_overlay_version = 'v3.2.0.0' %}
+{% set s6_overlay_url = 'https://github.com/just-containers/s6-overlay/releases/download/' %}
+{% set s6_overlay_noarch_checksum = 'sha256:4b0c0907e6762814c31850e0e6c6762c385571d4656eb8725852b0b1586713b6' %}
+ADD --checksum={{ s6_overlay_noarch_checksum }} \
+    {{ s6_overlay_url }}/{{ s6_overlay_version }}/s6-overlay-noarch.tar.xz /tmp
+RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz \
+    && rm /tmp/s6-overlay-noarch.tar.xz
+ADD {{ s6_overlay_url }}/{{ s6_overlay_version }}/s6-overlay-{{ base_arch }}.tar.xz /tmp
+RUN tar -C / -Jxpf /tmp/s6-overlay-{{ base_arch }}.tar.xz \
+    && rm /tmp/s6-overlay-{{ base_arch }}.tar.xz
+{% endblock %}
+
+COPY s6-rc.d/ /etc/s6-overlay/s6-rc.d/
+RUN chmod -R 755 /etc/s6-overlay
+
+{% block openvswitch_ipsec_footer %}{% endblock %}
+{% block footer %}
+ENTRYPOINT [ "/init" ]
+CMD []
+{% endblock %}

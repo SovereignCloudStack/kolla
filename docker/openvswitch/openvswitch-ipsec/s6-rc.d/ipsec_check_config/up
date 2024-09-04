@@ -1,0 +1,4 @@
+#!/command/execlineb -P
+/usr/libexec/ipsec/addconn \
+    --config /etc/ipsec.conf \
+    --checkconfig
