@@ -1,0 +1,5 @@
+#!/command/execlineb -P
+/usr/share/openvswitch/scripts/ovs-ctl \
+    --no-restart-ike-daemon \
+    --ike-daemon=libreswan \
+    start-ovs-ipsec
