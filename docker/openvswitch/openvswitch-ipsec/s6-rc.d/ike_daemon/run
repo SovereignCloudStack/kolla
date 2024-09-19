@@ -3,5 +3,4 @@
     --leak-detective \
     --config /etc/ipsec.conf \
     --nofork \
-    --nssdir /etc/ipsec.d \
     --logfile /var/log/kolla/openvswitch/pluto.log
