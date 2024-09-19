@@ -13,6 +13,7 @@ FROM {{ namespace }}/{{ image_prefix }}openvswitch-base:{{ tag }}
 
 {% if base_package_type == 'rpm' %}
     {% set openvswitch_ipsec_packages = [
+        'xz',
         'libreswan',
         'openvswitch3.3-ipsec',
     ] %}
@@ -33,14 +34,15 @@ FROM {{ namespace }}/{{ image_prefix }}openvswitch-base:{{ tag }}
 {% set s6_overlay_noarch_checksum = 'sha256:4b0c0907e6762814c31850e0e6c6762c385571d4656eb8725852b0b1586713b6' %}
 ADD --checksum={{ s6_overlay_noarch_checksum }} \
     {{ s6_overlay_url }}/{{ s6_overlay_version }}/s6-overlay-noarch.tar.xz /tmp
-RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
+RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz \
     && rm /tmp/s6-overlay-noarch.tar.xz
 ADD {{ s6_overlay_url }}/{{ s6_overlay_version }}/s6-overlay-{{ base_arch }}.tar.xz /tmp
-RUN tar -C / -Jxpf /tmp/s6-overlay-bin.tar.xz \
-    && rm /tmp/s6-overlay-bin.tar.xz
+RUN tar -C / -Jxpf /tmp/s6-overlay-{{ base_arch }}.tar.xz \
+    && rm /tmp/s6-overlay-{{ base_arch }}.tar.xz
 {% endblock %}
 
-COPY --chmod=755 s6-rc.d /etc/s6-overlay
+COPY s6-rc.d/ /etc/s6-overlay/s6-rc.d/
+RUN chmod -R 755 /etc/s6-overlay
 
 {% block openvswitch_ipsec_footer %}{% endblock %}
 {% block footer %}

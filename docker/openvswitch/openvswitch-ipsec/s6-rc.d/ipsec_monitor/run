@@ -1,5 +1,6 @@
 #!/command/execlineb -P
-/usr/share/openvswitch/scripts/ovs-ctl \
+/usr/share/openvswitch/scripts/ovs-monitor-ipsec \
     --no-restart-ike-daemon \
     --ike-daemon=libreswan \
-    start-ovs-ipsec
+    --log-file=/var/log/kolla/openvswitch/ovs-monitor-ipsec.log
+    unix:/run/openvswitch/
