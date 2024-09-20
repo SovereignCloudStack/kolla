@@ -3,4 +3,4 @@
     --no-restart-ike-daemon \
     --ike-daemon=libreswan \
     --log-file=/var/log/kolla/openvswitch/ovs-monitor-ipsec.log
-    unix:/run/openvswitch/
+    unix:/run/openvswitch/db.sock
