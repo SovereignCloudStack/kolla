@@ -2,5 +2,7 @@
 /usr/libexec/ipsec/pluto \
     --leak-detective \
     --config /etc/ipsec.conf \
+    --rundir /run/openvswitch \
+    --nssdir /etc/ipsec.d \
     --nofork \
     --logfile /var/log/kolla/openvswitch/pluto.log
