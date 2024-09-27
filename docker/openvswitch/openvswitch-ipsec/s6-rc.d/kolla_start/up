@@ -1,0 +1,2 @@
+#!/command/execlineb -S0
+/command/with-contenv kolla_start
