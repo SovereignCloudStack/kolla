@@ -83,6 +83,10 @@ SOURCES = {
         'type': 'url',
         'location': ('$tarballs_base/openstack/horizon/'
                      'horizon-${openstack_branch}.tar.gz')},
+    'horizon-plugin-bgpvpn-dashboard': {
+        'type': 'url',
+        'location': ('$tarballs_base/openstack/networking-bgpvpn/'
+                     'networking-bgpvpn-${openstack_branch}.tar.gz')},
     'horizon-plugin-blazar-dashboard': {
         'type': 'url',
         'location': ('$tarballs_base/openstack/blazar-dashboard/'
@@ -221,6 +225,10 @@ SOURCES = {
         'type': 'url',
         'location': ('$tarballs_base/openstack/networking-baremetal/'
                      'networking-baremetal-${openstack_branch}.tar.gz')},
+    'neutron-base-plugin-networking-bgpvpn': {
+        'type': 'url',
+        'location': ('$tarballs_base/openstack/networking-bgpvpn/'
+                     'networking-bgpvpn-${openstack_branch}.tar.gz')},
     'neutron-base-plugin-networking-generic-switch': {
         'type': 'url',
         'location': ('$tarballs_base/openstack/networking-generic-switch/'
@@ -245,6 +253,10 @@ SOURCES = {
         'type': 'url',
         'location': ('$tarballs_base/openstack/neutron-vpnaas/'
                      'neutron-vpnaas-${openstack_branch}.tar.gz')},
+    'networking-bgpvpn': {
+        'type': 'url',
+        'location': ('$tarballs_base/openstack/networking-bgpvpn/'
+                     'networking-bgpvpn-stable-${openstack_branch}.tar.gz')},
     'nova-base': {
         'type': 'url',
         'location': ('$tarballs_base/openstack/nova/'
@@ -265,6 +277,10 @@ SOURCES = {
         'type': 'url',
         'location': ('$tarballs_base/openstack/ovn-octavia-provider/'
                      'ovn-octavia-provider-${openstack_branch}.tar.gz')},
+    'ovn-bgp-agent': {
+        'type': 'url',
+        'location': ('$tarballs_base/openstack/ovn-bgp-agent/'
+                     'ovn-bgp-agent-${openstack_branch}.tar.gz')},
     'placement-base': {
         'type': 'url',
         'location': ('$tarballs_base/openstack/placement/'
