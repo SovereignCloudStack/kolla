@@ -19,6 +19,7 @@ import json
 import logging
 import os
 import pwd
+import re
 import shutil
 import stat
 import sys
@@ -53,6 +54,10 @@ class UserNotFound(ExitingException):
 
 
 class ConfigFileBadState(ExitingException):
+    pass
+
+
+class ConfigFileCommandDiffers(ExitingException):
     pass
 
 
@@ -334,6 +339,7 @@ def handle_permissions(config):
         owner = permission.get('owner')
         recurse = permission.get('recurse', False)
         perm = permission.get('perm')
+        exclude = permission.get('exclude', [])
 
         desired_user, desired_group = user_group(owner)
         uid = pwd.getpwnam(desired_user).pw_uid
@@ -373,14 +379,24 @@ def handle_permissions(config):
                     LOG.exception('Failed to set permission of %s to %s',
                                   path, perm)
 
+        def handle_exclusion(root, path_suffix):
+            full_path = os.path.join(root, path_suffix)
+            LOG.debug("Checking for exclusion: %s" % full_path)
+            if exclude:
+                for exclude_ in exclude:
+                    if not re.search(exclude_, full_path):
+                        set_perms(full_path, uid, gid, perm)
+            else:
+                set_perms(full_path, uid, gid, perm)
+
         for dest in glob.glob(path):
             set_perms(dest, uid, gid, perm)
             if recurse and os.path.isdir(dest):
                 for root, dirs, files in os.walk(dest):
                     for dir_ in dirs:
-                        set_perms(os.path.join(root, dir_), uid, gid, perm)
+                        handle_exclusion(root, dir_)
                     for file_ in files:
-                        set_perms(os.path.join(root, file_), uid, gid, perm)
+                        handle_exclusion(root, file_)
 
 
 def execute_config_strategy(config):
@@ -402,6 +418,15 @@ def execute_config_strategy(config):
         raise InvalidConfig('KOLLA_CONFIG_STRATEGY is not set properly')
 
 
+def execute_command_check(config):
+    cmd = config.get('command')
+    with open("/run_command", "r") as f:
+        cmd_running = f.read()
+    if cmd != cmd_running:
+        msg = "Running command differs. " + cmd + " != " + cmd_running
+        raise ConfigFileCommandDiffers(msg)
+
+
 def execute_config_check(config):
     for data in config.get('config_files', []):
         config_file = ConfigFile(**data)
@@ -419,6 +444,7 @@ def main():
         config = load_config()
 
         if args.check:
+            execute_command_check(config)
             execute_config_check(config)
         else:
             execute_config_strategy(config)

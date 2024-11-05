@@ -69,7 +69,9 @@
 - job:
     name: kolla-build-rocky9-aarch64
     parent: kolla-build-rocky9
-    nodeset: kolla-rockylinux-9-aarch64
+    nodeset: kolla-rockylinux-9
+    vars:
+      base_arch: aarch64
     voting: false
 
 - job:

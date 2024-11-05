@@ -28,20 +28,16 @@ DEFAULT_BASE_TAGS = {
     'centos': {'name': 'quay.io/centos/centos', 'tag': 'stream9'},
     'debian': {'name': 'debian', 'tag': 'bookworm'},
     'rocky': {'name': 'quay.io/rockylinux/rockylinux', 'tag': '9'},
-    'ubuntu': {'name': 'ubuntu', 'tag': '22.04'},
+    'ubuntu': {'name': 'ubuntu', 'tag': '24.04'},
 }
 # NOTE(hrw): has to match PRETTY_NAME in /etc/os-release
 DISTRO_PRETTY_NAME = {
     'centos': 'CentOS Stream 9',
     'debian': 'Debian GNU/Linux 12 (bookworm)',
     'rocky': 'Rocky Linux 9.* (Blue Onyx)',
-    'ubuntu': 'Ubuntu 22.04',
+    'ubuntu': 'Ubuntu 24.04.* LTS',
 }
-OPENSTACK_RELEASE = '2024.1'
-
-# This is noarch repository so we will use it on all architectures
-DELOREAN_DEPS = "https://trunk.rdoproject.org/centos9-caracal/" \
-    "delorean-deps.repo"
+OPENSTACK_RELEASE = '2024.2'
 
 # TODO(mandre) check for file integrity instead of downloading from an HTTPS
 # source
@@ -134,14 +130,15 @@ _PROFILE_OPTS = [
 ]
 
 hostarch = os.uname()[4]
-if hostarch == 'aarch64':
-    debianarch = 'arm64'
-elif hostarch == 'x86_64':
-    debianarch = 'amd64'
 
 # NOTE: Apple Silicon reports as arm64 which is aarch64
 if hostarch == "arm64":
     hostarch = "aarch64"
+
+if hostarch == 'aarch64':
+    debianarch = 'arm64'
+elif hostarch == 'x86_64':
+    debianarch = 'amd64'
 
 _CLI_OPTS = [
     cfg.StrOpt('base', short='b', default='rocky',
@@ -283,7 +280,7 @@ _BASE_OPTS = [
                help=('Set the package type of the distro. If not set then '
                      'the packaging type is set to "rpm" if a RHEL based '
                      'distro and "deb" if a Debian based distro.')),
-    cfg.ListOpt('rpm_setup_config', default=[DELOREAN_DEPS],
+    cfg.ListOpt('rpm_setup_config', default=[],
                 help=('Comma separated list of .rpm or .repo file(s) '
                       'or URL(s) to install before building containers')),
     cfg.StrOpt('apt_sources_list', help=('Path to custom sources.list')),

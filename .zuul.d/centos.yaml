@@ -22,7 +22,9 @@
 - job:
     name: kolla-build-centos9s-aarch64
     parent: kolla-build-centos9s
-    nodeset: kolla-centos-9-stream-aarch64
+    nodeset: kolla-centos-9-stream
+    vars:
+      base_arch: aarch64
     voting: false
 
 - job:

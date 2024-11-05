@@ -23,7 +23,6 @@ LABEL kolla_version="{{ kolla_version }}"
 {% block base_header %}{% endblock %}
 
 ENV KOLLA_BASE_DISTRO={{ base_distro }} \
-    KOLLA_DISTRO_PYTHON_VERSION={{ distro_python_version }} \
     KOLLA_BASE_ARCH={{ base_arch }}
 
 
@@ -77,7 +76,7 @@ COPY dnf.conf /etc/dnf/dnf.conf
 
 {% elif base_arch == 'aarch64' %}
     {% set base_yum_repo_files = base_yum_repo_files + [
-        'hrw-copr-erlang-for-rabbitmq.repo',
+        'copr-rabbitmq-erlang.repo',
     ] %}
 
 {#
@@ -131,8 +130,7 @@ RUN rm -f /etc/rpm/macros.image-language-conf \
 ] %}
 
 {% set base_centos_yum_repo_packages = [
-    'centos-release-ceph-reef',
-    'centos-release-nfv-openvswitch',
+    'centos-release-openstack-dalmatian',
     'centos-release-opstools',
     'epel-release',
 ] %}
@@ -151,23 +149,12 @@ RUN rm -f /etc/rpm/macros.image-language-conf \
     'centos-ceph-reef',
     'centos-nfv-openvswitch',
     'centos-opstools',
-    'centos9-nfv-ovs',
-    'centos9-opstools',
-    'centos9-rabbitmq',
-    'centos9-storage',
+    'centos-rabbitmq-38',
     'epel',
     'influxdb',
     'opensearch-2.x',
     'opensearch-dashboards-2.x',
 ] %}
-
-{% if base_arch == 'aarch64' %}
-
-{# NOTE(hrw): delorean-deps.repo may force x86-64 repos #}
-
-RUN sed -i -e "s/x86_64/aarch64/g" /etc/yum.repos.d/delorean-deps.repo
-
-{% endif %}
 
 RUN {{ macros.install_packages(base_centos_yum_repo_packages | customizable("centos_yum_repo_packages"), chain=True, clean=False) }}
 
@@ -265,7 +252,7 @@ COPY sources.list /etc/apt/sources.list.d/kolla-custom.list
 
 RUN apt update \
  && apt install -y --no-install-recommends extrepo \
- && extrepo enable openstack_bobcat \
+ && extrepo enable openstack_caracal \
  && apt purge -y extrepo \
  && apt --purge autoremove -y \
  && apt clean
@@ -280,6 +267,7 @@ COPY apt_preferences /etc/apt/preferences.d/kolla-custom
 {% set base_apt_packages = [
    'apt-utils',
    'dumb-init',
+   'systemd-standalone-sysusers',
    'gawk',
    'iproute2',
    'kmod',
@@ -308,7 +296,7 @@ COPY apt_preferences /etc/apt/preferences.d/kolla-custom
    {'name': 'influxdb', 'url': 'https://repos.influxdata.com/influxdata-archive_compat.key'},
    {'name': 'mariadb', 'url': 'https://downloads.mariadb.com/MariaDB/mariadb-keyring-2019.gpg', 'type': 'gpg'},
    {'name': 'opensearch', 'url': 'https://artifacts.opensearch.org/publickeys/opensearch.pgp'},
-   {'name': 'proxysql', 'url': 'https://repo.proxysql.com/ProxySQL/proxysql-2.6.x/repo_pub_key'},
+   {'name': 'proxysql', 'url': 'https://repo.proxysql.com/ProxySQL/proxysql-2.7.x/repo_pub_key'},
    {'name': 'treasuredata', 'url': 'https://packages.treasuredata.com/GPG-KEY-td-agent'},
 ] %}
 
@@ -360,6 +348,7 @@ RUN sed -ri '/-session(\s+)optional(\s+)pam_systemd.so/d' /etc/pam.d/system-auth
 COPY set_configs.py /usr/local/bin/kolla_set_configs
 COPY start.sh /usr/local/bin/kolla_start
 COPY copy_cacerts.sh /usr/local/bin/kolla_copy_cacerts
+COPY install_projects.sh /usr/local/bin/kolla_install_projects
 COPY httpd_setup.sh /usr/local/bin/kolla_httpd_setup
 COPY sudoers /etc/sudoers
 
@@ -377,7 +366,10 @@ RUN chmod 755 /usr/local/bin/healthcheck_*
 {% endif %}
 
 RUN touch /usr/local/bin/kolla_extend_start \
-    && chmod 755 /usr/local/bin/kolla_start /usr/local/bin/kolla_set_configs /usr/local/bin/kolla_copy_cacerts \
+    && chmod 755 /usr/local/bin/kolla_start \
+                 /usr/local/bin/kolla_set_configs \
+                 /usr/local/bin/kolla_copy_cacerts \
+                 /usr/local/bin/kolla_install_projects \
     && chmod 644 /usr/local/bin/kolla_extend_start /usr/local/bin/kolla_httpd_setup \
     && chmod 440 /etc/sudoers \
     && mkdir -p /var/log/kolla \

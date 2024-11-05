@@ -17,7 +17,6 @@
 UNBUILDABLE_IMAGES = {
     'aarch64': {
         "bifrost-base",        # someone need to get upstream working first
-        "prometheus-msteams",  # no aarch64 binary
         "prometheus-mtail",    # no aarch64 binary
     },
 
@@ -42,6 +41,7 @@ UNBUILDABLE_IMAGES = {
     },
 
     'rocky': {
+        "collectd",              # Missing libpqos.so.4()(64bit)
         "hacluster-pcs",         # Missing crmsh package
         "nova-spicehtml5proxy",  # Missing spicehtml5 package
         "ovsdpdk",               # Not supported on CentOS

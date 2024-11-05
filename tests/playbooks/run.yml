@@ -3,13 +3,14 @@
   vars_files:
     - ../vars/zuul.yml
   vars:
-    tag_suffix: "{{ '-aarch64' if ansible_architecture == 'aarch64' else '' }}"
+    tag_suffix: "{{ '-aarch64' if base_arch == 'aarch64' else '' }}"
     kolla_build_config:
       DEFAULT:
         debug: true
         logs_dir: "{{ kolla_build_logs_dir }}"
         quiet: true
         base: "{{ base_distro }}"
+        base_arch: "{{ base_arch }}"
         engine: "{{ container_engine }}"
         template_override: /etc/kolla/template_overrides.j2
         # NOTE(yoctozepto): to avoid issues with IPv6 not enabled in the docker daemon
@@ -37,13 +38,5 @@
     - import_role:
         name: kolla-build-config
 
-    - name: Template template_overrides.j2
-      template:
-        src: "{{ zuul.executor.work_root }}/{{ zuul.project.src_dir }}/tests/templates/template_overrides.j2"
-        dest: /etc/kolla/template_overrides.j2
-
-    - name: Run kolla-build to template out dockerfiles
-      command: "{{ virtualenv_path }}/bin/kolla-build --template-only --work-dir {{ kolla_build_logs_dir }}/work_dir"
-
-    - name: Run kolla-build
-      command: "{{ virtualenv_path }}/bin/kolla-build"
+    - import_role:
+        name: kolla-build

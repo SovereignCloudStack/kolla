@@ -43,7 +43,7 @@
       command: "{{ virtualenv_path }}/bin/python -m pip install {{ zuul.project.src_dir }}"
 
     - name: Install docker python library
-      command: "{{ virtualenv_path }}/bin/python -m pip install 'docker<7'"
+      command: "{{ virtualenv_path }}/bin/python -m pip install docker"
       when: container_engine == "docker"
 
     - name: Install podman python library
@@ -158,14 +158,6 @@
               prefix = "docker.io"
               location = "{{ zuul_site_mirror_fqdn }}:8082"
 
-        - name: Add libcontainers repo for newer buildah on Ubuntu 22.04
-          ansible.builtin.apt_repository:
-            repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/unstable/xUbuntu_22.04/ /
-            filename: kubic-libcontainers
-            state: present
-          become: true
-          when: ansible_distribution == "Ubuntu" and ansible_distribution_release == "jammy"
-
         - name: Install Podman
           package:
             name: podman
@@ -201,3 +193,9 @@
           become: true
       when:
         - container_engine == "podman"
+
+    - name: Run multiarch/qemu-user-static image to support cross-arch build
+      command:
+        cmd: "{{ container_engine }} run --rm --privileged multiarch/qemu-user-static --reset -p yes"
+      become: true
+      when: ansible_facts.architecture != (base_arch | default('x86_64'))
