@@ -49,7 +49,7 @@ kolla_build_sources:
   openstack/networking-sfc:
     - neutron-base-plugin-networking-sfc
     - tacker-base-plugin-networking-sfc
-  openstack/networking-bgpvpn: neutron-base-plugin-networking-bgpvpn 
+  openstack/networking-bgpvpn: neutron-base-plugin-networking-bgpvpn
   openstack/neutron-vpnaas:
     - neutron-vpnaas-agent
     - neutron-base-plugin-vpnaas-agent
@@ -67,6 +67,7 @@ kolla_build_sources:
 
   # Horizon and its plugins
   openstack/horizon: horizon
+  openstack/bgpvpn-dashboard: horizon-plugin-bgpvpn-dashboard
   openstack/blazar-dashboard: horizon-plugin-blazar-dashboard
   openstack/cloudkitty-dashboard: horizon-plugin-cloudkitty-dashboard
   openstack/designate-dashboard: horizon-plugin-designate-dashboard

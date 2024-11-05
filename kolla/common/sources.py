@@ -83,6 +83,10 @@ SOURCES = {
         'type': 'url',
         'location': ('$tarballs_base/openstack/horizon/'
                      'horizon-${openstack_branch}.tar.gz')},
+    'horizon-plugin-bgpvpn-dashboard': {
+        'type': 'url',
+        'location': ('$tarballs_base/openstack/networking-bgpvpn/'
+                     'networking-bgpvpn-${openstack_branch}.tar.gz')},
     'horizon-plugin-blazar-dashboard': {
         'type': 'url',
         'location': ('$tarballs_base/openstack/blazar-dashboard/'
